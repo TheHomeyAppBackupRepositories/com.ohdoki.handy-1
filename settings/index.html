@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<!-- The '/homey.js' script must be included in your settings view to work -->
+	<script type="text/javascript" src="/homey.js" data-origin="settings"></script>
+</head>
+
+<body>
+	<h1 data-i18n="settings.title">
+		<!-- This will be filled with the translated string with key 'settings.title'. -->
+	</h1>
+	<p data-i18n="settings.subtitle">
+		<!-- This field will also be translated -->
+	</p>
+	<fieldset>
+		<legend>Online status check interval [ms]</legend>
+		<div class="field row">
+			<!-- <label for="interval-time"></label> -->
+			<input id="interval-time" type="text" value="" />
+		</div>
+	</fieldset>
+
+	<button id="save" class="right">Save changes</button>
+	<p id="info" style="display: none;">Saved</p>
+
+</body>
+<script type="text/javascript">
+	function onHomeyReady(Homey) {
+		console.log('STARTED');
+		Homey.ready();
+		// a method named 'onHomeyReady' must be present in your code		 function onHomeyReady(Homey) {			 // Tell Homey we're ready to be displayed			 Homey.ready();			 console.log('STARTED Homey.ready()');
+		// var connectionKey = document.getElementById("connection-key");
+		const IntervalTime = document.getElementById("interval-time");
+		const saveElement = document.getElementById("save");
+		const infoText = document.getElementById("info");
+		let timer;
+
+		Homey.get("interval-time", function (err, time) {
+			if (err) return Homey.alert(err); IntervalTime.value = time;
+		});
+
+		saveElement.addEventListener("click", function (e) {
+			const newTime = IntervalTime.value * 1;
+			clearTimeout(infoText);
+			//Needs to be called before Handy.confirm();
+			Homey.set("interval-time", newTime, function (err) {
+				//TODO: This is never called. Maybe only when err?
+				if (err) return Homey.alert(err);
+
+			});
+			Homey.alert("Interval time saved. Restart app to apply the changes. New time: " + newTime + "ms");
+			infoText.style.display = "block";
+			infoText = setTimeout(() => {
+				infoText.style.display = "none";
+			}, 2000);
+		});
+
+	}
+
+</script>
+
+</html>
